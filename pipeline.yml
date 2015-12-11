@@ -1,0 +1,30 @@
+resources:
+  - name: source-git
+    type: git
+    source:
+      uri: https://github.com/spring-projects/spring-petclinic.git
+      branch: master
+jobs:
+- name: hello-world
+  plan:
+  - get: source-git
+  - task: say-hello
+    config:
+      platform: linux
+      image: "docker:///maven"
+      inputs:
+      - name: source-git
+        path: .
+      run:
+        path: mvn
+        args: ["build"]
+  - task: say-hello2
+    config:
+      platform: linux
+      image: "docker:///ubuntu"
+      inputs:
+        - name: source-git
+          path: .
+      run:
+        path: bash
+        args: ["-c","ls -al"]
