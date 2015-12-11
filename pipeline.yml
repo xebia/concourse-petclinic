@@ -37,31 +37,31 @@ jobs:
         args:
           - "-c"
           - mvn -Dmaven.repo.local=$(pwd)/cache -f $(pwd)/source/pom.xml compile
-  # - aggregate:
-  #   - task: test-java7
-  #     config:
-  #       platform: linux
-  #       image: "docker:///maven#3.3.3-jdk-7"
-  #       inputs:
-  #       - name: compile
-  #         path: .
-  #       run:  
-  #         path: bash
-  #         args: 
-  #           - "-c"
-  #           - mvn -Dmaven.repo.local=$(pwd)/cache -f $(pwd)/source/pom.xml test
-  #   - task: test-java8
-  #     config:
-  #       platform: linux
-  #       image: "docker:///maven#3.3.3-jdk-8"
-  #       inputs:
-  #       - name: compile
-  #         path: .
-  #       run:
-  #         path: bash
-  #         args: 
-  #           - "-c"
-  #           - mvn -Dmaven.repo.local=$(pwd)/cache -f $(pwd)/source/pom.xml test
+  - aggregate:
+    - task: test-java7
+      config:
+        platform: linux
+        image: "docker:///maven#3.3.3-jdk-7"
+        inputs:
+        - name: compile
+          path: .
+        run:  
+          path: bash
+          args: 
+            - "-c"
+            - mvn -Dmaven.repo.local=$(pwd)/cache -f $(pwd)/source/pom.xml test
+    - task: test-java8
+      config:
+        platform: linux
+        image: "docker:///maven#3.3.3-jdk-8"
+        inputs:
+        - name: compile
+          path: .
+        run:
+          path: bash
+          args: 
+            - "-c"
+            - mvn -Dmaven.repo.local=$(pwd)/cache -f $(pwd)/source/pom.xml test
   - task: package
     config:
       platform: linux
@@ -75,11 +75,9 @@ jobs:
         path: bash
         args:
           - "-c"
-          - mv dockerfiles/docker/Dockerfile $(pwd)/source/ ; mvn -Dmaven.repo.local=$(pwd)/cache -Dmaven.test.skip=true -f $(pwd)/source/pom.xml package
+          - mv dockerfiles/docker/Dockerfile $(pwd)/source/ && mvn -Dmaven.repo.local=$(pwd)/cache -Dmaven.test.skip=true -f $(pwd)/source/pom.xml package
 
   # reached only after succeeding in all above tests
   - put: docker-petclinic
     params:
       build: package/source
-
-# source/target/petclinic.war
