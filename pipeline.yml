@@ -4,20 +4,48 @@ resources:
     source:
       uri: https://github.com/spring-projects/spring-petclinic.git
       branch: master
+  - name: docker-build-result
+    type: docker-image
+    source:
+     repository: {{dockerhub_buildimage}}
+     email: {{dockerhub_email}}
+     username: {{dockerhub_username}}
+     password: {{dockerhub_password}}
 jobs:
 - name: hello-world
   plan:
   - get: source-git
-  - task: say-hello
+  - task: build
     config:
       platform: linux
-      image: "docker:///maven"
+      image: "docker:///maven#onbuild"
       inputs:
       - name: source-git
         path: .
       run:
         path: mvn
-        args: ["build"]
+        args: ["package"]
+  - aggregate:
+    - task: test
+      config:
+        platform: linux
+        image: "docker:///maven#onbuild"
+        inputs:
+        - name: source-git
+          path: .
+        run:
+          path: mvn
+          args: ["test"]
+    - task: integration-test
+      config:
+        platform: linux
+        image: "docker:///maven#onbuild"
+        inputs:
+        - name: source-git
+          path: .
+        run:
+          path: mvn
+          args: ["integration-test"]
   - task: say-hello2
     config:
       platform: linux

@@ -1,0 +1,4 @@
+dockerhub_buildimage: blaat/concourse-petclinic
+dockerhub_username: blaataap
+dockerhub_email: bla@bla.com
+dockerhub_password: PASS123
